@@ -16,13 +16,15 @@ getNetAssetValue(): BigNumber
 getSharePrice(): BigNumber
 // Returns current share price in WETH (18 decimals)
 
+getReserveTokenBalance(): BigNumber
+// Returns unallocated WETH balance (18 decimals)
+
 #### User Information
 
 getShareBalance(address: string): BigNumber
 // Returns user's share balance (0 decimals - shares are not divisible)
 
-getReserveTokenBalance(): BigNumber
-// Returns unallocated WETH balance (18 decimals)
+
 
 #### Fund Parameters
 

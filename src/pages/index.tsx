@@ -2,7 +2,6 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
 import Head from 'next/head'
 import { PortfolioView } from '@/components/PortfolioView'
-import { NavDisplay } from '@/components/NavDisplay'
 
 
 export default function Home() {
@@ -32,7 +31,7 @@ export default function Home() {
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <NavDisplay />
+           
           </div>
           {!isConnected ? (
             <div className="text-center py-12">
