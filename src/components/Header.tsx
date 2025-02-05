@@ -6,7 +6,7 @@ export function Header() {
     <header className="border-b border-gray-800">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="text-xl font-bold text-white">
-          L(ai)rry Fink's ETF
+        L(ai)rry Fink&apos;s ETF
         </div>
         <div className="flex items-center gap-6">
           <a 

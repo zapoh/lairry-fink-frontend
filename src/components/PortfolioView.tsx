@@ -9,7 +9,7 @@ import { ShareBalance } from '@/components/ShareBalance';
 export function PortfolioView() {
   const { portfolio, isError, isLoading } = usePortfolio();
   const { netAssetValue, isLoading: isLoadingNAV } = useNetAssetValue();
-  const { sharePrice, formattedPrice, isLoading: isLoadingPrice } = useSharePrice();
+  const { formattedPrice, isLoading: isLoadingPrice } = useSharePrice();
   const { sharesOutstanding, isLoading: isLoadingShares } = useSharesOutstanding();
 
   if (isLoading || isLoadingNAV || isLoadingPrice || isLoadingShares) {

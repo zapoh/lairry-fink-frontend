@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getPublicClient, getWalletClient, type PublicClient, type WalletClient } from 'wagmi/actions';
+import {  getWalletClient } from 'wagmi/actions';
 import { FUND_CONTRACT_ABI, FUND_CONTRACT_ADDRESS } from '@/constants/contracts';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
