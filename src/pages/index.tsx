@@ -1,8 +1,4 @@
-import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
-import Head from 'next/head'
-import { PortfolioView } from '@/components/PortfolioView'
-import { formatEther } from 'ethers'
 import { ETFStats } from '@/components/ETFStats'
 import { PortfolioComposition } from '@/components/PortfolioComposition'
 import { ShareBalance } from '@/components/ShareBalance'

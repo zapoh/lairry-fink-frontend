@@ -1,4 +1,4 @@
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract } from 'wagmi';
 import { FUND_CONTRACT_ABI, FUND_CONTRACT_ADDRESS } from '@/constants/contracts';
 import { parseEther } from 'viem';
 

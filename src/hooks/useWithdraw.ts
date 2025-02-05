@@ -1,4 +1,4 @@
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { useWriteContract, useAccount } from 'wagmi';
 import { FUND_CONTRACT_ABI, FUND_CONTRACT_ADDRESS } from '@/constants/contracts';
 
 export function useWithdraw() {

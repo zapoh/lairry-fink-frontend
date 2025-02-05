@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { Web3Provider } from "@/providers/Web3Provider";
 import { Inter } from "next/font/google";
 import dynamic from 'next/dynamic';
 
