@@ -1,29 +1,27 @@
 'use client';
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { http, createConfig, WagmiConfig } from 'wagmi';
-import { sepolia } from 'viem/chains';
+import { WagmiConfig, createConfig } from 'wagmi';
+import { sepolia } from 'wagmi/chains';
+import { http } from 'viem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode, useState } from 'react';
 import '@rainbow-me/rainbowkit/styles.css';
 
-// Ensure we're using Sepolia testnet
-const chains = [sepolia] as const;
+const { connectors } = getDefaultWallets({
+  appName: 'Lairry Fink',
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
+});
 
 const config = createConfig({
-  chains,
+  chains: [sepolia],
   transports: {
-    [sepolia.id]: http(`https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`),
+    [sepolia.id]: http(),
   },
+  connectors,
 });
 
-const { wallets } = getDefaultWallets({
-  appName: 'Lairry Fink ETF',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
-});
+const queryClient = new QueryClient();
 
-export function Web3Provider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
-
+export default function Web3Provider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiConfig config={config}>
       <QueryClientProvider client={queryClient}>

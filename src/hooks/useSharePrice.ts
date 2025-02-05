@@ -10,7 +10,9 @@ export function useSharePrice() {
     abi: FUND_CONTRACT_ABI,
     functionName: 'getSharePrice',
     chainId,
-    enabled: Boolean(chainId),
+    query: {
+      enabled: Boolean(chainId),
+    }
   });
 
   // Format using 18 decimals (ETH standard)

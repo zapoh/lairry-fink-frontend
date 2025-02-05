@@ -9,7 +9,9 @@ export function useNetAssetValue() {
     abi: FUND_CONTRACT_ABI,
     functionName: 'getNetAssetValue',
     chainId,
-    enabled: Boolean(chainId), // Only run query when chainId is available
+    query: {
+      enabled: Boolean(chainId), // Only run query when chainId is available
+    }
   }) as { data: bigint | undefined, isError: boolean, isLoading: boolean };
 
   // Check if we're on the wrong network

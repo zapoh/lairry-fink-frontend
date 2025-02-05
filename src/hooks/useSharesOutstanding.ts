@@ -9,7 +9,9 @@ export function useSharesOutstanding() {
     abi: FUND_CONTRACT_ABI,
     functionName: 'getSharesOutstanding',
     chainId,
-    enabled: Boolean(chainId), // Only run query when chainId is available
+    query: {
+      enabled: Boolean(chainId), // Only run query when chainId is available
+    }
   });
 
   console.log('Shares Outstanding Call:', {

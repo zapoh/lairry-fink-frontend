@@ -11,7 +11,9 @@ export function useShareBalance() {
     functionName: 'getShareBalance',
     args: [address || '0x0'],
     chainId,
-    enabled: Boolean(chainId && address),
+    query: {
+      enabled: Boolean(chainId && address),
+    }
   });
 
   return {

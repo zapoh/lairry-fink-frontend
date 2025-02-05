@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 // Disable SSR for Web3Provider
 const Web3ProviderNoSSR = dynamic(
-  () => import('@/providers/Web3Provider').then(mod => mod.Web3Provider),
+  () => import('@/providers/Web3Provider'),
   { ssr: false }
 );
 
