@@ -64,3 +64,9 @@ to: string,
 amount: BigNumber
 ): Promise<TransactionResponse>
 // Withdraws accumulated fees to specified address
+
+### THINGS LEFT TO DO
+FIGURE OUT WHERE THE DEPOSITED VALUE IS GOINGG???
+OUTPUT ONLY ETH FROM the contract.
+Fix shares calculations in the frontend modal
+Implement withdrawal fee in the contract.

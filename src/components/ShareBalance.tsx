@@ -1,17 +1,25 @@
 import { useShareBalance } from '@/hooks/useShareBalance';
 import { useSharePrice } from '@/hooks/useSharePrice';
+import { useSharesOutstanding } from '@/hooks/useSharesOutstanding';
+
 import { useDeposit } from '@/hooks/useDeposit';
 import { useWithdraw } from '@/hooks/useWithdraw';
-import { useAccount } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
 import { useState } from 'react';
 import { Modal } from './Modal';
 
+const DEPOSIT_FEE = 0.01; // 1% fee
+const SCALAR = 100_000; // Initial shares per ETH
+
 export function ShareBalance() {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const { shareBalance, isError, isLoading } = useShareBalance();
   const { formattedPrice, isLoading: isPriceLoading } = useSharePrice();
   const { deposit, isPending: isDepositPending } = useDeposit();
   const { withdraw, isPending: isWithdrawPending } = useWithdraw();
+  const { data: ethBalance } = useBalance({
+    address,
+  });
   
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
@@ -52,18 +60,25 @@ export function ShareBalance() {
 
   // Calculate estimated shares whenever amount changes
   const updateEstimatedShares = (ethAmount: string) => {
-    if (!ethAmount || Number(ethAmount) <= 0 || !formattedPrice) {
+    if (!ethAmount || Number(ethAmount) <= 0) {
       setEstimatedShares('0');
       return;
     }
-    // Calculate shares using current share price
-    const shares = (Number(ethAmount) * 100_000_000) / formattedPrice;
+
+    // Apply deposit fee (1%)
+    const amountAfterFee = Number(ethAmount) * (1 - DEPOSIT_FEE);
+    
+    // If no shares outstanding (initial deposit), use SCALAR
+    if (!useSharesOutstanding) {
+      const initialShares = amountAfterFee * SCALAR;
+      setEstimatedShares(Math.floor(initialShares).toLocaleString());
+      return;
+    }
+
+    // For subsequent deposits, use current share price
+    const shares = amountAfterFee / formattedPrice;
     setEstimatedShares(Math.floor(shares).toLocaleString());
   };
-
-  if (!isConnected) {
-    return null;
-  }
 
   if (isLoading || isPriceLoading) {
     return (
@@ -82,29 +97,31 @@ export function ShareBalance() {
     );
   }
 
-  const sharesValue = Number(shareBalance) * formattedPrice;
+  const sharesValue = isConnected ? Number(shareBalance) * formattedPrice : 0;
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <div className="text-2xl font-bold text-gray-400">
-          My Shares: {Number(shareBalance).toLocaleString()}
+        <div className="text-xl font-bold text-gray-100">
+          My Shares: {isConnected ? Number(shareBalance).toLocaleString() : '0'}
         </div>
-        <div className="text-2xl font-bold text-gray-400">
-          Shares Value: {sharesValue.toFixed(4)} ETH
+        <div className="text-xl font-bold text-gray-100">
+          Shares Value: {isConnected ? sharesValue.toFixed(2) : '0.0000'} ETH
         </div>
       </div>
 
       <div className="flex gap-4">
         <button
           onClick={() => setIsDepositOpen(true)}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+          disabled={!isConnected}
+          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg"
         >
           Deposit
         </button>
         <button
           onClick={() => setIsWithdrawOpen(true)}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg"
+          disabled={!isConnected}
+          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg"
         >
           Withdraw
         </button>
@@ -121,9 +138,13 @@ export function ShareBalance() {
         title="Deposit ETH"
       >
         <div className="space-y-6">
-          <p className="text-gray-400">
-            Deposit ETH to mint ETF Shares to gain exposure to the current portfolio and all future airdrops
+          <p className="text-gray-300">
+            Deposit ETH and mint shares to gain proportional exposure to the current ETF portfolio and all future allocations
           </p>
+          
+          <div className="text-gray-400 text-sm">
+            Available: {ethBalance ? Number(ethBalance.formatted).toFixed(4) : '0.0000'} ETH
+          </div>
           
           <div className="space-y-2">
             <div>
@@ -138,6 +159,7 @@ export function ShareBalance() {
                 className="w-full bg-gray-800 text-white px-4 py-3 rounded-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 step="0.01"
                 min="0"
+                max={ethBalance ? Number(ethBalance.formatted) : 0}
               />
             </div>
             
@@ -171,12 +193,27 @@ export function ShareBalance() {
           setAmount('');
           setError(null);
         }}
-        title="Withdraw Shares"
+        title="Withdraw ETH"
       >
         <div className="space-y-4">
-          <div className="text-sm text-gray-400 mb-2">
-            Available Shares: {Number(shareBalance).toLocaleString()}
+        <div className="text-gray-400">
+            Upon withdrawal, your shares will be burned and the proportional underlying assets will be sold at current prices for ETH
           </div>
+          <div className="flex items-center justify-between text-sm">
+            <button 
+              onClick={() => setAmount(shareBalance.toString())}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              Available Shares: {Number(shareBalance).toLocaleString()}
+            </button>
+            <button
+              onClick={() => setAmount(shareBalance.toString())}
+              className="text-gray-400 hover:text-gray-300 text-sm ml-2"
+            >
+              max
+            </button>
+          </div>
+
           <div>
             <input
               type="number"
