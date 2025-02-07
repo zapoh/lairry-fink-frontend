@@ -100,7 +100,7 @@ export function ShareBalance() {
   const sharesValue = isConnected ? Number(shareBalance) * formattedPrice : 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-12">
       <div className="space-y-2">
         <div className="text-xl font-bold text-gray-100">
           My Shares: {isConnected ? Number(shareBalance).toLocaleString() : '0'}
@@ -114,14 +114,14 @@ export function ShareBalance() {
         <button
           onClick={() => setIsDepositOpen(true)}
           disabled={!isConnected}
-          className="flex-1 bg-primary hover:bg-primary-600 disabled:bg-primary-800 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl"
+          className="flex-1 bg-primary hover:bg-primary-600 disabled:bg-primary-800 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-xl"
         >
           Deposit
         </button>
         <button
           onClick={() => setIsWithdrawOpen(true)}
           disabled={!isConnected}
-          className="flex-1 border border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-200 disabled:border-primary-800 disabled:text-primary-800 disabled:cursor-not-allowed font-bold py-3 px-6 rounded-xl"
+          className="flex-1 border border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-200 disabled:border-primary-800 disabled:text-primary-800 disabled:cursor-not-allowed font-bold py-4 px-6 rounded-xl"
         >
           Withdraw
         </button>

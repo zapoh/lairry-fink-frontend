@@ -1,12 +1,15 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { FaBook, FaXTwitter } from 'react-icons/fa6';
+import { useAccount } from 'wagmi';
 
 export function Header() {
+  const { isConnected } = useAccount();
+
   return (
     <header className="border-b border-background-light">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="text-xl font-bold text-white">
- 
+        <div className="text-xl font-bold text-primary">
+          {isConnected && "L(ai)rry Fink"}
         </div>
         <div className="flex items-center gap-6">
           <a 
