@@ -5,7 +5,7 @@ export function PortfolioComposition() {
 
   if (isLoading) {
     return (
-      <div className="animate-pulse text-gray-400">
+      <div className="animate-pulse text-primary-300">
         Loading portfolio...
       </div>
     );
@@ -20,17 +20,17 @@ export function PortfolioComposition() {
   }
 
   return (
-    <div className="bg-gray-900 rounded-lg p-6">
-      <h2 className="text-base font-semibold text-gray-400 mb-6">ETF Portfolio Composition</h2>
+    <div className="bg-background-light rounded-lg p-6">
+      <h2 className="text-base font-semibold text-primary mb-6">ETF Portfolio Composition</h2>
       <div className="space-y-4">
         {portfolio.length === 0 ? (
-          <div className="text-gray-400">
+          <div className="text-primary-300">
             No assets in portfolio
           </div>
         ) : (
           <>
             {/* Header */}
-            <div className="grid grid-cols-4 text-sm text-gray-400 border-b border-gray-800 pb-2">
+            <div className="grid grid-cols-4 text-sm text-primary-300 border-b border-background pb-2">
               <div>Token</div>
               <div className="text-right">Allocation</div>
               <div className="text-right">Balance</div>

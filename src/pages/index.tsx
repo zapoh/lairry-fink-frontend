@@ -3,14 +3,15 @@ import { ETFStats } from '@/components/ETFStats'
 import { PortfolioComposition } from '@/components/PortfolioComposition'
 import { ShareBalance } from '@/components/ShareBalance'
 import { Header } from '@/components/Header'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export default function Home() {
   const { isConnected } = useAccount()
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 flex flex-col py-8">
         {isConnected ? (
           <div className="space-y-6">
             <ShareBalance />
@@ -18,14 +19,30 @@ export default function Home() {
             <PortfolioComposition />
           </div>
         ) : (
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <p className="text-gray-100 text-xl">Connect your wallet and deposit ETH to gain diversified exposure to projects handpicked by L(ai)rry Fink.</p>
-              <p className="text-gray-100 text-xl">Check out <a href="https://docs.lairryfink.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">DOCS</a> to learn more.</p>
+          <div className="h-full flex flex-col py-24 justify-center gap-14">
+            <div className="text-center space-y-14">
+              <p className="text-gray-100 text-6xl font-bold">
+                Fully onchain, AI-controlled ETF
+              </p>
+              <p className="text-gray-100 text-4xl font-bold">
+                Get diversified exposure to new launches handpicked by <span className="text-primary">L(ai)rry Fink.</span>
+              </p>
             </div>
-            <div className="space-y-6">
+            <div className="flex justify-center py-12 gap-20">
+              <div className="scale-150 origin-center">
+                <ConnectButton />
+              </div>
+              <a 
+                href="https://docs.lairryfink.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="scale-150 origin-center px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-200 rounded-xl"
+              >
+                Learn More
+              </a>
+            </div>
+            <div className="w-full">
               <ETFStats />
-              <PortfolioComposition />
             </div>
           </div>
         )}

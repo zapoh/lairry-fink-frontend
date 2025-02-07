@@ -85,6 +85,11 @@ contract LairryFinkFund is Ownable {
     mapping(address => uint256) private allocation;
     address[] private assets;
 
+    // Add new state variable next to depositFee
+    uint256 private withdrawalFee;
+    uint256 withdrawalFeeBalance;
+    uint256 private immutable creationWithdrawalFee;
+
     constructor(
         address _wethAddress,   
         string memory _shareTokenName,
@@ -94,7 +99,8 @@ contract LairryFinkFund is Ownable {
         bool _depositsEnabled,
         uint256 _minimumDeposit,
         uint256 _slippageTolerance,
-        uint256 _depositFee
+        uint256 _depositFee,
+        uint256 _withdrawalFee
     )
         Ownable(msg.sender)
     {
@@ -111,6 +117,8 @@ contract LairryFinkFund is Ownable {
         slippageTolerance = _slippageTolerance;
         depositFee = _depositFee;
         creationDepositFee = _depositFee;
+        withdrawalFee = _withdrawalFee;
+        creationWithdrawalFee = _withdrawalFee;
     }
     function getReserveTokenAddress() public view returns (address) {
         return address(WETH);
@@ -118,10 +126,10 @@ contract LairryFinkFund is Ownable {
 
       function getReserveTokenBalance() public view returns (uint256) {
         uint256 wethBalance = IERC20(address(WETH)).balanceOf(address(this));
-        if (wethBalance <= depositFeeBalance) {
+        if (wethBalance <= depositFeeBalance + withdrawalFeeBalance) {
             return 0;
         }
-        return wethBalance - depositFeeBalance;
+        return wethBalance - depositFeeBalance - withdrawalFeeBalance;
     }
 
     function getShareTokenAddress() public view returns (address) {
@@ -192,15 +200,28 @@ contract LairryFinkFund is Ownable {
     function getDepositFeeBalance() public view returns (uint256) {
         return depositFeeBalance;
     }
-    function withdrawDepositFees(address payable to, uint256 amount) public onlyOwner {
-    require(depositFeeBalance > 0, "Current fee balance is 0.");
-    require(amount <= depositFeeBalance, "Requested withdrawal amount exceeds fee balance.");
 
-        depositFeeBalance -= amount;
-     WETH.withdraw(amount);
-     (bool success, ) = to.call{value: amount}("");
-    require(success, "ETH transfer failed");
+    function getWithdrawFeeBalance() public view returns (uint256) {
+    return withdrawalFeeBalance;
 }
+
+    function getWithdrawalFee() public view returns (uint256) {
+        return withdrawalFee;
+    }
+
+    function setWithdrawalFee(uint256 _withdrawalFee) public onlyOwner {
+        require(_withdrawalFee <= creationWithdrawalFee, "Fee cannot be set higher than creation fee");
+        withdrawalFee = _withdrawalFee;
+    }
+
+    function withdrawDepositFees(address to, uint256 amount) public onlyOwner {
+        require(amount <= depositFeeBalance + withdrawalFeeBalance, "Withdrawal amount exceeds fee balance");
+        depositFeeBalance = depositFeeBalance + withdrawalFeeBalance - amount;
+        withdrawalFeeBalance = 0;
+        WETH.withdraw(amount);
+        (bool success, ) = payable(to).call{value: amount}("");
+        require(success, "ETH transfer failed");
+    }
 
     // Return a tuple of arrays for current asset information:
     // (
@@ -265,38 +286,38 @@ contract LairryFinkFund is Ownable {
         );
 
         require(
-        msg.value >= minimumDeposit,
+            msg.value >= minimumDeposit,
             "Deposit amount is less than the minimum deposit."
         );
-   // Wrap ETH to WETH
-        WETH.deposit{value: msg.value}();
- 
+
+        // Calculate shares based on NAV before wrapping new ETH
+        uint256 shares;
+        uint256 netAssetValue;
+        uint256 sharesOutstanding = getSharesOutstanding();
+
         // Determine deposit fee
         uint256 feeMax = 10**BASIS_POINTS;
         uint256 fee = depositFee * msg.value / feeMax;
         uint256 amountLessFee = msg.value - fee;
-        depositFeeBalance += fee;
 
-        // Determine share purchase amount
-        uint256 shares;
-        uint256 netAssetValue;
-        uint256 sharesOutstanding = getSharesOutstanding();
         if (sharesOutstanding == 0) {
+            uint256 SCALAR = 100_000;
 
-            uint256 SCALAR = 100_000_000;
-
-            // Initial deposit - establish share price of 1 ETH = 100,000,000 share
+            // Initial deposit - establish share price of 1 ETH = 100,000 share
             shares = (amountLessFee * SCALAR) / (10 ** WETH_DECIMALS);
             sharesOutstanding = shares;
             netAssetValue = amountLessFee;
         } else {
-            netAssetValue = getNetAssetValue();
+            netAssetValue = getNetAssetValue();  // This now correctly gets NAV before new deposit
             shares = amountLessFee * sharesOutstanding / netAssetValue;
         }
         require(shares > 0, "You must buy at least one share.");
 
-        // Since we are buying an integer number of shares, there may
-        // be change left over if `amountLessFee / price` has a fractional part.
+        // Now wrap ETH to WETH after share calculation
+        WETH.deposit{value: msg.value}();
+        depositFeeBalance += fee;
+
+        // Calculate change
         uint256 shareValue = shares * netAssetValue / sharesOutstanding;
         uint256 change = amountLessFee - shareValue;
 
@@ -336,6 +357,7 @@ contract LairryFinkFund is Ownable {
         require(msg.sender == address(WETH), "Direct ETH transfers not allowed");
     }
 
+
     // Add fallback function to prevent accidental ETH transfers
     fallback() external payable {
         revert("Direct ETH transfers not allowed");
@@ -352,30 +374,29 @@ contract LairryFinkFund is Ownable {
     // Emits a {Withdraw} event on success.
         function withdraw(uint256 shares, address payable to) public {
         uint256 sharesOutstanding = getSharesOutstanding();
-        require(
-            sharesOutstanding > 0,
-            "No shares outstanding."
-        );
+        require(sharesOutstanding > 0, "No shares outstanding.");
         require(shares > 0, "You must sell at least one share.");
         uint256 shareBalance = getShareBalance(msg.sender);
         require(shareBalance >= shares, "Sell amount is greater than current share balance.");
         uint256 shareValue = shares * getSharePrice();
 
-        // Sell shareholder's share of assets
+        // Calculate withdrawal fee
+        uint256 feeMax = 10**BASIS_POINTS;
+        uint256 fee = withdrawalFee * shareValue / feeMax;
+        withdrawalFeeBalance += fee;
+
+        // Sell assets first
         IUniswapV2Router02 router = IUniswapV2Router02(uniswapV2Router02Address);
         for (uint256 i = 0; i < assets.length; i++) {
             address tokenAddress = assets[i];
             IERC20 token = IERC20(tokenAddress);
             uint256 sellAmount = shares * token.balanceOf(address(this)) / sharesOutstanding;
-            _sell(
-                router,
-                tokenAddress,
-                sellAmount,
-                to
-            );
+            if (sellAmount > 0) {
+                _sell(router, tokenAddress, sellAmount, address(this));
+            }
         }
 
-        // Handle the shareholder's share of WETH (unallocated portion)
+        // Handle WETH portion (remove fee deduction)
         uint256 wethWithdrawalAmount = shares * getReserveTokenBalance() / sharesOutstanding;
         if (wethWithdrawalAmount > 0) {
             WETH.withdraw(wethWithdrawalAmount);
@@ -383,10 +404,10 @@ contract LairryFinkFund is Ownable {
             require(success, "ETH transfer failed");
         }
 
-        // Burn shareholder's sold shares
+        // Burn shares
         shareToken.burn(msg.sender, shares);
 
-        emit Withdraw(msg.sender, to, shares, shareValue);
+        emit Withdraw(msg.sender, to, shares, shareValue - fee);
     }
 
     // Set the pool's allocation for the asset specified by `tokenAddress`.
@@ -562,3 +583,5 @@ function _sell(IUniswapV2Router02 router, address tokenAddress, uint256 amount, 
     );
     }
 }
+
+

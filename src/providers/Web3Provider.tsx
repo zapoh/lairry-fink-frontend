@@ -1,5 +1,5 @@
 'use client';
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { getDefaultWallets, RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { WagmiConfig, createConfig } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
 import { http } from 'viem';
@@ -25,7 +25,13 @@ export default function Web3Provider({ children }: { children: React.ReactNode }
   return (
     <WagmiConfig config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider
+          theme={darkTheme({
+            accentColor: 'rgb(255, 15, 123)',
+            accentColorForeground: 'white',
+            borderRadius: 'large',
+          })}
+        >
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>
