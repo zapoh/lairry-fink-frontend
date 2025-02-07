@@ -142,8 +142,19 @@ export function ShareBalance() {
             Deposit ETH and mint shares to gain proportional exposure to the current ETF portfolio and all future allocations
           </p>
           
-          <div className="text-gray-400 text-sm">
-            Available: {ethBalance ? Number(ethBalance.formatted).toFixed(4) : '0.0000'} ETH
+          <div className="flex items-center justify-between text-sm">
+            <button 
+              onClick={() => setAmount(ethBalance ? ethBalance.formatted : '0')}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              Available: {ethBalance ? Number(ethBalance.formatted).toFixed(4) : '0.0000'} ETH
+            </button>
+            <button
+              onClick={() => setAmount(ethBalance ? ethBalance.formatted : '0')}
+              className="text-gray-400 hover:text-gray-300 text-sm ml-2"
+            >
+              max
+            </button>
           </div>
           
           <div className="space-y-2">
