@@ -26,7 +26,7 @@ export default function Home() {
                 Fully onchain, AI-controlled ETF.
               </p>
               <p className="text-gray-100 text-4xl font-bold">
-                Get diversified exposure to new project launches handpicked by <span className="text-primary">L<span className="text-white">(ai)</span>rry Fink</span>
+                Get diversified exposure to new token launches handpicked by <span className="text-primary">L<span className="text-white">(ai)</span>rry Fink</span>
               </p>
             </div>
             <div className="flex justify-center py-12 gap-20">
