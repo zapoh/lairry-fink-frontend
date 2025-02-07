@@ -2,7 +2,7 @@ export function Footer() {
   return (
     <footer className="py-6 border-t border-background-light">
       <div className="container mx-auto px-4">
-        <p className="text-center text-gray-400 text-md">
+        {/* <p className="text-center text-gray-400 text-md">
           <span className="text-primary">L<span className="text-white">(ai)</span>rry Fink</span> is a project by{" "}
           <a 
             href="https://trulyadog.com" 
@@ -13,7 +13,7 @@ export function Footer() {
             $PAWSY
           </a>{" "}
           ecosystem
-        </p>
+        </p> */}
       </div>
     </footer>
   );
