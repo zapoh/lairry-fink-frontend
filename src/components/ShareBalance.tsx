@@ -179,7 +179,7 @@ export function ShareBalance() {
           <button
             onClick={handleDeposit}
             disabled={isDepositPending}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg"
+            className="w-full bg-primary hover:bg-primary-600 disabled:bg-primary-800 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl"
           >
             {isDepositPending ? 'Depositing...' : 'Deposit'}
           </button>
@@ -234,7 +234,7 @@ export function ShareBalance() {
           <button
             onClick={handleWithdraw}
             disabled={isWithdrawPending}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-bold py-2 px-4 rounded-lg"
+            className="w-full bg-primary hover:bg-primary-600 disabled:bg-primary-800 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl"
           >
             {isWithdrawPending ? 'Withdrawing...' : 'Withdraw'}
           </button>
