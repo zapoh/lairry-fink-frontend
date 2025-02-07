@@ -15,12 +15,12 @@ export function Header() {
             </>
           )}
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-10">
           <a 
             href="https://docs.lairryfink.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-primary hover:text-primary-300 transition-colors"
+            className=" hover:text-primary-300 transition-colors"
           >
             <FaBook size={20} />
           </a>
@@ -28,7 +28,7 @@ export function Header() {
             href="https://x.com/lairryfink" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-primary hover:text-primary-300 transition-colors"
+            className=" hover:text-primary-300 transition-colors"
           >
             <FaXTwitter size={20} />
           </a>
