@@ -3,6 +3,7 @@ import { ETFStats } from '@/components/ETFStats'
 import { PortfolioComposition } from '@/components/PortfolioComposition'
 import { ShareBalance } from '@/components/ShareBalance'
 import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export default function Home() {
@@ -22,10 +23,10 @@ export default function Home() {
           <div className="h-full flex flex-col py-24 justify-center gap-14">
             <div className="text-center space-y-14">
               <p className="text-gray-100 text-6xl font-bold">
-                Fully onchain, AI-controlled ETF
+                Fully onchain, AI-controlled ETF.
               </p>
               <p className="text-gray-100 text-4xl font-bold">
-                Get diversified exposure to new launches handpicked by <span className="text-primary">L(ai)rry Fink.</span>
+                Get diversified exposure to new project launches handpicked by <span className="text-primary">L(ai)rry Fink.</span>
               </p>
             </div>
             <div className="flex justify-center py-12 gap-20">
@@ -47,6 +48,7 @@ export default function Home() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   )
 }
