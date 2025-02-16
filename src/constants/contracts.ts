@@ -1,4 +1,4 @@
-export const FUND_CONTRACT_ADDRESS = '0x06aecCA0b571121CB922B9Fd315840Cc75BB3333' as `0x${string}`;
+export const FUND_CONTRACT_ADDRESS = '0xC32e30AE3a3EE5665ABc8dfA2452F49B5d918D08' as `0x${string}`;
 
 export const FUND_CONTRACT_ABI = [
   {
@@ -51,6 +51,11 @@ export const FUND_CONTRACT_ABI = [
       {
         "internalType": "uint256",
         "name": "_withdrawalFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_lockPeriod",
         "type": "uint256"
       }
     ],
@@ -127,6 +132,19 @@ export const FUND_CONTRACT_ABI = [
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newLockPeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "LockPeriodUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -140,6 +158,50 @@ export const FUND_CONTRACT_ABI = [
       }
     ],
     "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "shares",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "unlockTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "SharesLocked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "shares",
+        "type": "uint256"
+      }
+    ],
+    "name": "SharesUnlocked",
     "type": "event"
   },
   {
@@ -251,6 +313,19 @@ export const FUND_CONTRACT_ABI = [
   },
   {
     "inputs": [],
+    "name": "getLockPeriod",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getMinimumDeposit",
     "outputs": [
       {
@@ -354,6 +429,37 @@ export const FUND_CONTRACT_ABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getShareLocks",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "shares",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct LairryFinkFund.ShareLock[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getSharePrice",
     "outputs": [
@@ -419,6 +525,25 @@ export const FUND_CONTRACT_ABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getUnlockedShares",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getWithdrawFeeBalance",
     "outputs": [
@@ -434,6 +559,19 @@ export const FUND_CONTRACT_ABI = [
   {
     "inputs": [],
     "name": "getWithdrawalFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lockPeriod",
     "outputs": [
       {
         "internalType": "uint256",
@@ -517,6 +655,19 @@ export const FUND_CONTRACT_ABI = [
       }
     ],
     "name": "setDepositsEnabled",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_lockPeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "setLockPeriod",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
