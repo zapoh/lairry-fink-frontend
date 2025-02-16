@@ -1,4 +1,4 @@
-export const FUND_CONTRACT_ADDRESS = '0xC32e30AE3a3EE5665ABc8dfA2452F49B5d918D08' as `0x${string}`;
+export const FUND_CONTRACT_ADDRESS = '0x25D19eE180a50a7Aa24B1f0f36F7b5Ce7963a51D' as `0x${string}`;
 
 export const FUND_CONTRACT_ABI = [
   {
@@ -514,6 +514,25 @@ export const FUND_CONTRACT_ABI = [
   {
     "inputs": [],
     "name": "getTotalAllocation",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getTotalShares",
     "outputs": [
       {
         "internalType": "uint256",

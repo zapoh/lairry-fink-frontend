@@ -1,7 +1,8 @@
 import { useShareBalance } from '@/hooks/useShareBalance';
 import { useSharePrice } from '@/hooks/useSharePrice';
 import { useSharesOutstanding } from '@/hooks/useSharesOutstanding';
-
+import { useUnlockedShares } from '@/hooks/useUnlockedShares';
+import { useTotalShares } from '@/hooks/useTotalShares';
 import { useDeposit } from '@/hooks/useDeposit';
 import { useWithdraw } from '@/hooks/useWithdraw';
 import { useAccount, useBalance } from 'wagmi';
@@ -13,7 +14,8 @@ const SCALAR = 100_000; // Initial shares per ETH
 
 export function ShareBalance() {
   const { isConnected, address } = useAccount();
-  const { shareBalance, isError, isLoading } = useShareBalance();
+  const { totalShares, isError: isTotalError, isLoading: isTotalLoading } = useTotalShares();
+  const { unlockedShares, isLoading: isLoadingUnlocked } = useUnlockedShares();
   const { formattedPrice, isLoading: isPriceLoading } = useSharePrice();
   const { deposit, isPending: isDepositPending } = useDeposit();
   const { withdraw, isPending: isWithdrawPending } = useWithdraw();
@@ -47,8 +49,8 @@ export function ShareBalance() {
       if (!amount || Number(amount) <= 0) {
         throw new Error('Please enter a valid number of shares');
       }
-      if (Number(amount) > Number(shareBalance)) {
-        throw new Error('Cannot withdraw more shares than you own');
+      if (Number(amount) > Number(unlockedShares)) {
+        throw new Error('Cannot withdraw more shares than your unlocked balance');
       }
       await withdraw(amount);
       setIsWithdrawOpen(false);
@@ -80,7 +82,7 @@ export function ShareBalance() {
     setEstimatedShares(Math.floor(shares).toLocaleString());
   };
 
-  if (isLoading || isPriceLoading) {
+  if (isTotalLoading || isLoadingUnlocked || isPriceLoading) {
     return (
       <div className="space-y-2">
         <div className="text-2xl font-bold animate-pulse">Loading shares...</div>
@@ -89,7 +91,7 @@ export function ShareBalance() {
     );
   }
 
-  if (isError) {
+  if (isTotalError) {
     return (
       <div className="text-2xl font-bold text-red-500">
         Error loading shares
@@ -97,13 +99,16 @@ export function ShareBalance() {
     );
   }
 
-  const sharesValue = isConnected ? Number(shareBalance) * formattedPrice : 0;
+  const sharesValue = isConnected ? Number(totalShares) * formattedPrice : 0;
 
   return (
     <div className="space-y-12">
       <div className="space-y-2">
         <div className="text-xl font-bold text-gray-100">
-          My Shares: {isConnected ? Number(shareBalance).toLocaleString() : '0'}
+          My Shares: {isConnected ? Number(totalShares).toLocaleString() : '0'}
+        </div>
+        <div className="text-xl font-bold text-gray-100">
+          Available to Withdraw: {isConnected ? Number(unlockedShares).toLocaleString() : '0'}
         </div>
         <div className="text-xl font-bold text-gray-100">
           Shares Value: {isConnected ? sharesValue.toFixed(2) : '0.0000'} ETH
@@ -207,18 +212,18 @@ export function ShareBalance() {
         title="Withdraw ETH"
       >
         <div className="space-y-4">
-        <div className="text-gray-400">
+          <div className="text-gray-400">
             Upon withdrawal, your shares will be burned and the proportional underlying assets will be sold at current prices for ETH
           </div>
           <div className="flex items-center justify-between text-sm">
             <button 
-              onClick={() => setAmount(shareBalance.toString())}
+              onClick={() => setAmount(unlockedShares.toString())}
               className="text-gray-400 hover:text-white transition-colors"
             >
-              Available Shares: {Number(shareBalance).toLocaleString()}
+              Available to Withdraw: {Number(unlockedShares).toLocaleString()}
             </button>
             <button
-              onClick={() => setAmount(shareBalance.toString())}
+              onClick={() => setAmount(unlockedShares.toString())}
               className="text-gray-400 hover:text-gray-300 text-sm ml-2"
             >
               max
@@ -234,7 +239,7 @@ export function ShareBalance() {
               className="w-full bg-gray-800 text-white px-4 py-2 rounded-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               step="1"
               min="1"
-              max={Number(shareBalance)}
+              max={Number(unlockedShares)}
             />
           </div>
           {error && (
@@ -244,7 +249,7 @@ export function ShareBalance() {
           )}
           <button
             onClick={handleWithdraw}
-            disabled={isWithdrawPending}
+            disabled={isWithdrawPending || Number(unlockedShares) === 0}
             className="w-full bg-primary hover:bg-primary-600 disabled:bg-primary-800 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl"
           >
             {isWithdrawPending ? 'Withdrawing...' : 'Withdraw'}
