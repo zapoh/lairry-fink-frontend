@@ -1,4 +1,3 @@
-import { useShareBalance } from '@/hooks/useShareBalance';
 import { useSharePrice } from '@/hooks/useSharePrice';
 import { useSharesOutstanding } from '@/hooks/useSharesOutstanding';
 import { useUnlockedShares } from '@/hooks/useUnlockedShares';
@@ -17,6 +16,7 @@ export function ShareBalance() {
   const { totalShares, isError: isTotalError, isLoading: isTotalLoading } = useTotalShares();
   const { unlockedShares, isLoading: isLoadingUnlocked } = useUnlockedShares();
   const { formattedPrice, isLoading: isPriceLoading } = useSharePrice();
+  const { sharesOutstanding } = useSharesOutstanding();
   const { deposit, isPending: isDepositPending } = useDeposit();
   const { withdraw, isPending: isWithdrawPending } = useWithdraw();
   const { data: ethBalance } = useBalance({
@@ -71,7 +71,7 @@ export function ShareBalance() {
     const amountAfterFee = Number(ethAmount) * (1 - DEPOSIT_FEE);
     
     // If no shares outstanding (initial deposit), use SCALAR
-    if (!useSharesOutstanding) {
+    if (Number(sharesOutstanding) === 0) {
       const initialShares = amountAfterFee * SCALAR;
       setEstimatedShares(Math.floor(initialShares).toLocaleString());
       return;
